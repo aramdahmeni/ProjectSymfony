@@ -1,4 +1,12 @@
-{{ form_start(form) }}
-    {{ form_widget(form) }}
-    <button class="btn">{{ button_label|default('Save') }}</button>
-{{ form_end(form) }}
+{% extends 'base.html.twig' %}
+
+{% block title %}Create New Post{% endblock %}
+
+{% block body %}
+
+    {{ form_start(form) }}
+    {{ form_row(form.contenu) }}
+    {{ form_row(form.files) }}
+    <button type="submit">Save</button>
+    {{ form_end(form) }}
+{% endblock %}

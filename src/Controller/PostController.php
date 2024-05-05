@@ -3,7 +3,7 @@
 namespace App\Controller;
 use App\Repository\CommentRepository;
 use App\Entity\Post;
-use App\Entity\Like;
+use App\Entity\File;
 use App\Entity\User;
 
 use App\Form\PostType;
@@ -15,6 +15,7 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Security\Core\User\UserInterface;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 
 
@@ -46,21 +47,37 @@ public function index(PostRepository $postRepository, CommentRepository $comment
 }
 
 
-    #[Route('/new', name: 'app_post_new', methods: ['GET', 'POST'])]
-    public function new(Request $request): Response
+#[Route('/new', name: 'app_post_new', methods: ['GET', 'POST'])]
+public function new(Request $request): Response
 {
     $post = new Post();
     $form = $this->createForm(PostType::class, $post);
     $form->handleRequest($request);
 
     if ($form->isSubmitted() && $form->isValid()) {
-        // Set the published datetime to the current time
+        // Handle file upload
+        $uploadedFiles = $request->files->get('post')['files'];
+
+        foreach ($uploadedFiles as $uploadedFile) {
+            // Create a new File entity for each uploaded file
+            $file = new File();
+            // Handle file upload logic and set properties of File entity
+            // For example:
+            $fileName = md5(uniqid()) . '.' . $uploadedFile->guessExtension();
+            $uploadedFile->move($this->getParameter('uploads_directory'), $fileName);
+            $file->setFileName($fileName);
+            // Add the file to the Post entity
+            $post->addFile($file);
+        }
+
+        // Set other properties of the Post entity as needed
         $post->setPublished(new \DateTime());
 
+        // Persist the Post entity
         $this->entityManager->persist($post);
         $this->entityManager->flush();
 
-        return $this->redirectToRoute('app_post_index'); // Corrected route name
+        return $this->redirectToRoute('app_post_index');
     }
 
     return $this->render('post/new.html.twig', [

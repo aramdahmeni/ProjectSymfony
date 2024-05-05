@@ -27,11 +27,15 @@ class Post
     #[ORM\OneToMany(targetEntity: Like::class, mappedBy: 'post', orphanRemoval: true)] // Corrected mappedBy attribute
     private Collection $likes;
 
+    #[ORM\OneToMany(targetEntity: File::class, mappedBy: 'post')]
+    private Collection $files;
+
     public function __construct()
     {
         $this->comments = new ArrayCollection();
         $this->published = new \DateTime();
         $this->likes = new ArrayCollection();
+        $this->files = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -140,5 +144,35 @@ class Post
         }
 
         return false; // User has not liked the post
+    }
+
+    /**
+     * @return Collection<int, File>
+     */
+    public function getFiles(): Collection
+    {
+        return $this->files;
+    }
+
+    public function addFile(File $file): static
+    {
+        if (!$this->files->contains($file)) {
+            $this->files->add($file);
+            $file->setPost($this);
+        }
+
+        return $this;
+    }
+
+    public function removeFile(File $file): static
+    {
+        if ($this->files->removeElement($file)) {
+            // set the owning side to null (unless already changed)
+            if ($file->getPost() === $this) {
+                $file->setPost(null);
+            }
+        }
+
+        return $this;
     }
 }
