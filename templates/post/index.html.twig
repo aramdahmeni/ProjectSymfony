@@ -24,7 +24,9 @@
                     <a href="{{ path('app_post_show', {'id': post.id}) }}">show</a>
                     <a href="{{ path('app_post_edit', {'id': post.id}) }}">edit</a>
                     <a href="{{ path('app_comment_new', {'postId': post.id}) }}">addComment</a>
-                    <a href="{{ path('app_post_comments', {'postId': post.id}) }}" class="show-comments" data-comments-url="{{ path('app_post_comments', {'postId': post.id}) }}">showComments</a>
+                    {% for comment in post.comments %}
+                        {{ comment.contenu }}
+                    {% endfor %}
                 </td>
             </tr>
             <tr class="comments-row" style="display: none;">
@@ -43,35 +45,3 @@
 
     <a href="{{ path('app_post_new') }}">Create new</a>
 {% endblock %}
-
-{% block javascripts %}
-    <script>
-        document.querySelectorAll('.show-comments').forEach(link => {
-            link.addEventListener('click', function (event) {
-                event.preventDefault();
-                const postId = this.getAttribute('data-post-id');
-                const commentsRow = document.querySelector('.comments-row[data-post-id="' + postId + '"]');
-                const commentsList = commentsRow.querySelector('.comments-list');
-
-                if (commentsRow.style.display === 'none') {
-                    commentsRow.style.display = 'table-row';
-                    
-                    // Fetch comments URL from data attribute
-                    const commentsUrl = this.getAttribute('data-comments-url');
-
-                    // Fetch comments via AJAX
-                    fetch(commentsUrl)
-                        .then(response => response.json())
-                        .then(comments => {
-                            commentsList.innerHTML = comments.map(comment => `<li>${comment.content}</li>`).join('');
-                        })
-                        .catch(error => console.error('Error fetching comments:', error));
-                } else {
-                    commentsRow.style.display = 'none';
-                    commentsList.innerHTML = ''; // Clear comments when hiding
-                }
-            });
-        });
-    </script>
-{% endblock %}
-

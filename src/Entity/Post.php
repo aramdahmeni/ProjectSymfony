@@ -27,7 +27,6 @@ class Post
     public function __construct()
     {
         $this->comments = new ArrayCollection();
-        // Automatically set the published datetime to the current time when a new Post is created
         $this->published = new \DateTime();
     }
 

@@ -17,12 +17,16 @@ class Comment
     #[ORM\Column(length: 255)]
     private ?string $contenu = null;
 
-    #[ORM\Column(type: Types::DATETIME_MUTABLE)]
+    #[ORM\Column(type: "datetime")]
     private ?\DateTimeInterface $published = null;
 
     #[ORM\ManyToOne(inversedBy: 'comments')]
-    private ?post $post = null;
+    private ?Post $post = null;
 
+    public function __construct()
+    {
+        $this->published = new \DateTime();
+    }
     public function getId(): ?int
     {
         return $this->id;
@@ -52,12 +56,12 @@ class Comment
         return $this;
     }
 
-    public function getPost(): ?post
+    public function getPost(): ?Post
     {
         return $this->post;
     }
 
-    public function setPost(?post $post): static
+    public function setPost(?Post $post): static
     {
         $this->post = $post;
 
