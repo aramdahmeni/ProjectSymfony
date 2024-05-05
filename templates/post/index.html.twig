@@ -1,3 +1,5 @@
+{# post/index.html.twig #}
+
 {% extends 'base.html.twig' %}
 
 {% block title %}Post index{% endblock %}
@@ -11,7 +13,8 @@
                 <th>Id</th>
                 <th>Contenu</th>
                 <th>Published</th>
-                <th>actions</th>
+                <th>Actions</th>
+                <th>Likes</th>
             </tr>
         </thead>
         <tbody>
@@ -24,24 +27,36 @@
                     <a href="{{ path('app_post_show', {'id': post.id}) }}">show</a>
                     <a href="{{ path('app_post_edit', {'id': post.id}) }}">edit</a>
                     <a href="{{ path('app_comment_new', {'postId': post.id}) }}">addComment</a>
-                    {% for comment in post.comments %}
-                        {{ comment.contenu }}
-                    {% endfor %}
                 </td>
-            </tr>
-            <tr class="comments-row" style="display: none;">
-                <td colspan="4">
-                    <h3>Comments:</h3>
-                    <ul class="comments-list"></ul>
+                <td>
+                    <button class="like-button" data-post-id="{{ post.id }}">Like</button>
+                    
                 </td>
             </tr>
         {% else %}
             <tr>
-                <td colspan="4">no records found</td>
+                <td colspan="5">no records found</td>
             </tr>
         {% endfor %}
         </tbody>
     </table>
 
     <a href="{{ path('app_post_new') }}">Create new</a>
+{% endblock %}
+
+{% block javascripts %}
+    <script>
+        document.querySelectorAll('.like-button').forEach(button => {
+            button.addEventListener('click', function() {
+                const postId = this.getAttribute('data-post-id');
+                fetch(`/post/${postId}/like`, { method: 'POST' })
+                    .then(response => response.json())
+                    .then(data => {
+                        const likeCountElement = document.querySelector(`.like-count[data-post-id="${postId}"]`);
+                        likeCountElement.textContent = data.likes;
+                    })
+                    .catch(error => console.error('Error liking post:', error));
+            });
+        });
+    </script>
 {% endblock %}

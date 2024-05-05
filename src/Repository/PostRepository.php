@@ -16,11 +16,22 @@ use Doctrine\Persistence\ManagerRegistry;
  */
 class PostRepository extends ServiceEntityRepository
 {
+    
     public function __construct(ManagerRegistry $registry)
     {
         parent::__construct($registry, Post::class);
     }
 
+    public function getLikesCountForPost(Post $post): int
+    {
+        return $this->createQueryBuilder('p')
+            ->select('COUNT(l.id)')
+            ->leftJoin('p.likes', 'l')
+            ->andWhere('p.id = :idPost')
+            ->setParameter('idPost', $post->getId())
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
 //    /**
 //     * @return Post[] Returns an array of Post objects
 //     */

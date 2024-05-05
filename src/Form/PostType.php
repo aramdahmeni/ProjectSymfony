@@ -15,7 +15,6 @@ class PostType extends AbstractType
         $builder
             ->add('contenu', TextareaType::class, [
                 'label' => 'Content',
-                // Add any other options you need
             ]);
     }
 

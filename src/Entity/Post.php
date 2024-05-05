@@ -24,10 +24,14 @@ class Post
     #[ORM\OneToMany(targetEntity: Comment::class, mappedBy: 'post')]
     private Collection $comments;
 
+    #[ORM\OneToMany(targetEntity: Like::class, mappedBy: 'post', orphanRemoval: true)] // Corrected mappedBy attribute
+    private Collection $likes;
+
     public function __construct()
     {
         $this->comments = new ArrayCollection();
         $this->published = new \DateTime();
+        $this->likes = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -40,7 +44,7 @@ class Post
         return $this->contenu;
     }
 
-    public function setContenu(string $contenu): static
+    public function setContenu(string $contenu): self
     {
         $this->contenu = $contenu;
 
@@ -52,7 +56,7 @@ class Post
         return $this->published;
     }
 
-    public function setPublished(?\DateTimeInterface $published): static
+    public function setPublished(?\DateTimeInterface $published): self
     {
         $this->published = $published;
 
@@ -67,7 +71,7 @@ class Post
         return $this->comments;
     }
 
-    public function addComment(Comment $comment): static
+    public function addComment(Comment $comment): self
     {
         if (!$this->comments->contains($comment)) {
             $this->comments->add($comment);
@@ -77,7 +81,7 @@ class Post
         return $this;
     }
 
-    public function removeComment(Comment $comment): static
+    public function removeComment(Comment $comment): self
     {
         if ($this->comments->removeElement($comment)) {
             // set the owning side to null (unless already changed)
@@ -87,5 +91,54 @@ class Post
         }
 
         return $this;
+    }
+
+    /**
+     * @return Collection<int, Like>
+     */
+    public function getLikes(): Collection
+    {
+        return $this->likes;
+    }
+
+    public function addLike(Like $like): self
+    {
+        if (!$this->likes->contains($like)) {
+            $this->likes->add($like);
+            $like->setPost($this); // Corrected setting the post for the like
+        }
+
+        return $this;
+    }
+
+    public function removeLike(Like $like): self
+    {
+        if ($this->likes->removeElement($like)) {
+            // set the owning side to null (unless already changed)
+            if ($like->getPost() === $this) { // Corrected getting the post from the like
+                $like->setPost(null);
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Check if a user has already liked the post.
+     *
+     * @param int $userId
+     * @return bool
+     */
+    public function hasUserLiked(int $userId): bool
+    {
+        // Loop through the likes associated with the post
+        foreach ($this->likes as $like) {
+            // Check if the user ID matches the provided user ID
+            if ($like->getUser()->getId() === $userId) {
+                return true; // User has already liked the post
+            }
+        }
+
+        return false; // User has not liked the post
     }
 }
