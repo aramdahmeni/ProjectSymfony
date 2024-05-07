@@ -7,7 +7,15 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 
+
 #[ORM\Entity(repositoryClass: UserRepository::class)]
+#[ORM\InheritanceType("SINGLE_TABLE")]
+#[ORM\DiscriminatorColumn(name: "user_type", type: "string")]
+#[ORM\DiscriminatorMap([
+    "user" => "User",
+    "etudiant" => "Etudiant",
+    "enseignant" => "Enseignant"
+])]
 class User
 {
     #[ORM\Id]
@@ -15,9 +23,23 @@ class User
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 20)]
-    private ?string $username = null;
+    #[ORM\Column(length: 255)]
+    private ?string $nom = null;
 
+    #[ORM\Column(length: 255)]
+    private ?string $prenom = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $email = null;
+
+    #[ORM\Column]
+    private ?int $numtel = null;
+
+    #[ORM\Column]
+    private ?int $type = null;
+
+    #[ORM\Column(length: 255)]
+    private ?string $password = null;
     /**
      * @ORM\OneToMany(targetEntity=Like::class, mappedBy="user")
      */
@@ -33,14 +55,74 @@ class User
         return $this->id;
     }
 
-    public function getUsername(): ?string
+    public function getNom(): ?string
     {
-        return $this->username;
+        return $this->nom;
     }
 
-    public function setUsername(string $username): self
+    public function setNom(string $nom): static
     {
-        $this->username = $username;
+        $this->nom = $nom;
+
+        return $this;
+    }
+
+    public function getPrenom(): ?string
+    {
+        return $this->prenom;
+    }
+
+    public function setPrenom(string $prenom): static
+    {
+        $this->prenom = $prenom;
+
+        return $this;
+    }
+
+    public function getEmail(): ?string
+    {
+        return $this->email;
+    }
+
+    public function setEmail(string $email): static
+    {
+        $this->email = $email;
+
+        return $this;
+    }
+
+    public function getNumtel(): ?int
+    {
+        return $this->numtel;
+    }
+
+    public function setNumtel(int $numtel): static
+    {
+        $this->numtel = $numtel;
+
+        return $this;
+    }
+
+    public function getType(): ?int
+    {
+        return $this->type;
+    }
+
+    public function setType(int $type): static
+    {
+        $this->type = $type;
+
+        return $this;
+    }
+
+    public function getPassword(): ?string
+    {
+        return $this->password;
+    }
+
+    public function setPassword(string $password): static
+    {
+        $this->password = $password;
 
         return $this;
     }

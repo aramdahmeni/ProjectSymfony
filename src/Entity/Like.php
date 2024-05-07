@@ -6,9 +6,12 @@ use App\Repository\LikeRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use ApiPlatform\Metadata\ApiResource;
 
 #[ORM\Entity(repositoryClass: LikeRepository::class)]
 #[ORM\Table(name: 'likes')] // Change the table name to 'likes'
+#[ApiResource()]
+
 class Like
 {
     #[ORM\Id]

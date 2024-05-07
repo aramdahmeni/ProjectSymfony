@@ -16,8 +16,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
-
-
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 
 #[Route('/post')]
 class PostController extends AbstractController
@@ -30,21 +29,26 @@ class PostController extends AbstractController
     }
 
     #[Route('/', name: 'app_post_index', methods: ['GET'])]
-public function index(PostRepository $postRepository, CommentRepository $commentRepository): Response
-{
-    $posts = $postRepository->findAll();
-    $comments = [];
-
-    // Fetch comments for each post
-    foreach ($posts as $post) {
-        $comments[$post->getId()] = $commentRepository->findBy(['post' => $post]);
+    public function index(
+        PostRepository $postRepository,
+        CommentRepository $commentRepository,
+        HttpClientInterface $client
+    ): Response {
+        $comments = [];
+        $response = $client->request('GET', 'API_URL');
+        $posts = $response->toArray();
+    
+        // Fetch comments for each post
+        foreach ($posts as $post) {
+            $comments[$post->getId()] = $commentRepository->findBy(['post' => $post]);
+        }
+    
+        return $this->render('post/index.html.twig', [
+            'posts' => $posts, // Removed unnecessary array wrapping
+            'comments' => $comments,
+        ]);
     }
-
-    return $this->render('post/index.html.twig', [
-        'posts' => $posts,
-        'comments' => $comments,
-    ]);
-}
+    
 
 
 #[Route('/new', name: 'app_post_new', methods: ['GET', 'POST'])]
