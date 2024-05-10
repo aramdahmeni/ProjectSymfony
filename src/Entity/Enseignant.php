@@ -15,9 +15,7 @@ use Doctrine\ORM\Mapping as ORM;
 class Enseignant extends User
 {
     
-    #[ORM\Column]
-    private ?int $typeENS = null;
-
+    
     #[ORM\Column(length: 255)]
     private ?string $codeENS = null;
 
@@ -38,18 +36,6 @@ class Enseignant extends User
     }
 
     
-
-    public function getTypeENS(): ?int
-    {
-        return $this->typeENS;
-    }
-
-    public function setTypeENS(int $typeENS): static
-    {
-        $this->typeENS = $typeENS;
-
-        return $this;
-    }
 
     public function getCodeENS(): ?string
     {

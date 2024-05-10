@@ -13,9 +13,7 @@ use Doctrine\ORM\Mapping as ORM;
 class Etudiant extends User
 {
     
-    #[ORM\Column]
-    private ?int $typeET = null;
-
+    
     #[ORM\Column(length: 255)]
     private ?string $specialite = null;
 
@@ -26,18 +24,6 @@ class Etudiant extends User
     private $classe;
 
    
-
-    public function getTypeET(): ?int
-    {
-        return $this->typeET;
-    }
-
-    public function setTypeET(int $typeET): static
-    {
-        $this->typeET = $typeET;
-
-        return $this;
-    }
 
     public function getSpecialite(): ?string
     {

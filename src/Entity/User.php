@@ -6,7 +6,7 @@ use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-
+use App\Enum\UserType;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\InheritanceType("SINGLE_TABLE")]
@@ -14,7 +14,8 @@ use Doctrine\ORM\Mapping as ORM;
 #[ORM\DiscriminatorMap([
     "user" => "User",
     "etudiant" => "Etudiant",
-    "enseignant" => "Enseignant"
+    "enseignant" => "Enseignant",
+    "administrateur" => "Administrateur",
 ])]
 class User
 {
@@ -35,8 +36,11 @@ class User
     #[ORM\Column]
     private ?int $numtel = null;
 
-    #[ORM\Column]
-    private ?int $type = null;
+    /**
+ * @ORM\Column
+ * @Assert\Choice(choices=UserType::values(), message="Choose a valid type.")
+ */
+    private ?string $type = null;
 
     #[ORM\Column(length: 255)]
     private ?string $password = null;
@@ -103,12 +107,12 @@ class User
         return $this;
     }
 
-    public function getType(): ?int
+    public function getType(): ?string
     {
         return $this->type;
     }
 
-    public function setType(int $type): static
+    public function setType(string $type): static
     {
         $this->type = $type;
 
