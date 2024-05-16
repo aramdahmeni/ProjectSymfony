@@ -16,11 +16,17 @@
         <tbody>
         {% for user in users %}
             <tr>
+                {% for user in users %}
+            <tr>
                 <td>{{ user.id }}</td>
-                <td>{{ user.username }}</td>
+                <td>{{ user.email }}</td>
                 <td>
                     <a href="{{ path('app_user_show', {'id': user.id}) }}">show</a>
                     <a href="{{ path('app_user_edit', {'id': user.id}) }}">edit</a>
+                </td>
+            </tr>
+{% endfor %}
+
                 </td>
             </tr>
         {% else %}

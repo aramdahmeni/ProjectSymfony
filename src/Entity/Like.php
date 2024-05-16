@@ -1,15 +1,17 @@
 <?php
 
 namespace App\Entity;
-
+use App\Entity\User;
+use App\Entity\Etudiant;
+use App\Entity\Enseignant;
 use App\Repository\LikeRepository;
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiResource;
 
 #[ORM\Entity(repositoryClass: LikeRepository::class)]
-#[ORM\Table(name: 'likes')] // Change the table name to 'likes'
+#[ORM\Table(name: 'likes')]
 #[ApiResource()]
 
 class Like
@@ -19,11 +21,11 @@ class Like
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\ManyToOne(targetEntity: Post::class, inversedBy: 'likes')] // Define Many-to-One relationship with Post
+    #[ORM\ManyToOne(targetEntity: Post::class, inversedBy: 'likes')]
     #[ORM\JoinColumn(nullable: false)]
     private ?Post $post = null;
 
-    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'likes')] // Define Many-to-One relationship with User
+    #[ORM\ManyToOne(targetEntity: User::class, inversedBy: 'likes')] 
     #[ORM\JoinColumn(nullable: false)]
     private ?User $user = null;
 
@@ -54,5 +56,18 @@ class Like
         $this->user = $user;
 
         return $this;
+    }
+    /**
+     * @Assert\Callback()
+     */
+    public function validateUserType(ExecutionContextInterface $context)
+    {
+        $user = $this->getUser();
+
+        if (!$user instanceof Etudiant && !$user instanceof Enseignant) {
+            $context->buildViolation('Only Etudiant and Enseignant can like a post.')
+                ->atPath('user')
+                ->addViolation();
+        }
     }
 }

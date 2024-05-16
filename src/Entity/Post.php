@@ -7,6 +7,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiResource;
+use phpDocumentor\Reflection\Types\Boolean;
+
 #[ORM\Entity(repositoryClass: PostRepository::class)]
 #[ApiResource()]
 
@@ -31,6 +33,13 @@ class Post
 
     #[ORM\OneToMany(targetEntity: File::class, mappedBy: 'post')]
     private Collection $files;
+
+    #[ORM\Column]
+    private ?bool $estPublie = null;
+
+    #[ORM\ManyToOne(inversedBy: 'posts')]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $user = null;
 
     public function __construct()
     {
@@ -174,6 +183,30 @@ class Post
                 $file->setPost(null);
             }
         }
+
+        return $this;
+    }
+
+    public function isEstPublie(): ?bool
+    {
+        return $this->estPublie;
+    }
+
+    public function setEstPublie(bool $estPublie): static
+    {
+        $this->estPublie = $estPublie;
+
+        return $this;
+    }
+
+    public function getUser(): ?User
+    {
+        return $this->user;
+    }
+
+    public function setUser(?User $user): static
+    {
+        $this->user = $user;
 
         return $this;
     }

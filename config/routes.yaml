@@ -1,7 +1,85 @@
 controllers:
     resource: ../src/Controller/
     type: attribute
-app_post_comments:
-    path: '/post/{postId}/comments'
-    controller: 'App\Controller\CommentController::index'
+
+app_post_index:
+    path: /posts
+    controller: 'App\Controller\PostController::index'
     methods: ['GET']
+app_post_new:
+  path: /posts/new
+  controller: 'App\Controller\PostController::new'
+  methods: ['GET', 'POST']
+
+app_post_show:
+  path: /posts/{id}
+  controller: 'App\Controller\PostController::show'
+  methods: ['GET']
+
+app_post_edit:
+  path: /posts/{id}/edit
+  controller: 'App\Controller\PostController::edit'
+  methods: ['GET', 'POST']
+
+app_post_delete:
+  path: /posts/{id}
+  controller: 'App\Controller\PostController::delete'
+  methods: ['POST']
+
+app_post_comments:
+  path: /posts/{postId}/comments
+  controller: 'App\Controller\PostController::comments'
+  methods: ['GET']
+app_comment_index:
+  path: /comments
+  controller: 'App\Controller\CommentController::index'
+  methods: ['GET']
+
+app_comment_new:
+  path: /comments/new/{postId}
+  controller: 'App\Controller\CommentController::new'
+  methods: ['GET', 'POST']
+
+app_comment_show:
+  path: /comments/{id}
+  controller: 'App\Controller\CommentController::show'
+  methods: ['GET']
+
+app_comment_show_post:
+  path: /comments/show/{postId}
+  controller: 'App\Controller\CommentController::showComments'
+  methods: ['GET']
+
+app_comment_edit:
+  path: /comments/{id}/edit
+  controller: 'App\Controller\CommentController::edit'
+  methods: ['GET', 'POST']
+
+app_comment_delete:
+  path: /comments/{id}
+  controller: 'App\Controller\CommentController::delete'
+  methods: ['POST']
+app_user_index:
+  path: /users
+  controller: 'App\Controller\UserController::index'
+  methods: ['GET']
+
+app_user_new:
+  path: /users/new
+  controller: 'App\Controller\UserController::new'
+  methods: ['GET', 'POST']
+
+app_user_show:
+  path: /users/{id}
+  controller: 'App\Controller\UserController::show'
+  methods: ['GET']
+
+app_user_edit:
+  path: /users/{id}/edit
+  controller: 'App\Controller\UserController::edit'
+  methods: ['GET', 'POST']
+
+app_user_delete:
+  path: /users/{id}
+  controller: 'App\Controller\UserController::delete'
+  methods: ['POST']

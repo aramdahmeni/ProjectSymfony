@@ -12,6 +12,9 @@ class EnseignantType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options): void
     {
         $builder
+        ->add('codeENS')
+        ->add('nbAnneeExp')
+        ->add('matiere')
         ;
     }
 
