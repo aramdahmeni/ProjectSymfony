@@ -20,7 +20,7 @@ class File
     private ?string $fileName = null;
 
     #[ORM\ManyToOne(inversedBy: 'files')]
-    private ?post $post = null;
+    private ?Post $post = null;
 
     public function getId(): ?int
     {
@@ -39,12 +39,12 @@ class File
         return $this;
     }
 
-    public function getPost(): ?post
+    public function getPost(): ?Post
     {
         return $this->post;
     }
 
-    public function setPost(?post $post): static
+    public function setPost(?Post $post): static
     {
         $this->post = $post;
 

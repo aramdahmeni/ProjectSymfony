@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Entity;
+use Symfony\Component\Serializer\Annotation\Groups;
 
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -10,6 +11,9 @@ use App\Enum\UserType;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\PasswordHasher\PasswordHasherInterface;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use Symfony\Component\Validator\Constraints as Assert;
+
 #[ORM\Entity(repositoryClass: UserRepository::class)]
 #[ORM\InheritanceType("SINGLE_TABLE")]
 #[ORM\DiscriminatorColumn(name: "user_type", type: "string")]
@@ -32,7 +36,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[ORM\Column(length: 255)]
     private ?string $prenom = null;
 
-    #[ORM\Column(length: 255)]
+    
+    #[ORM\Column(length: 255, unique: true)]
+    #[Assert\Email]
     private ?string $email = null;
 
     #[ORM\Column]
@@ -57,15 +63,22 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
      */
     private Collection $likes;
 
-    #[ORM\OneToMany(targetEntity: Post::class, mappedBy: 'user', orphanRemoval: true)]
-    private Collection $posts;
+ /**
+     * @ORM\OneToMany(targetEntity=Post::class, mappedBy="user", orphanRemoval=true)
+     * @Groups({"user_read"})
+     */    private Collection $posts;
+
+    /**
+     * @ORM\Column(type="json")
+     */
+    private $roles = [];
 
     
     public function __construct()
     {
         $this->likes = new ArrayCollection();
         $this->posts = new ArrayCollection();
-
+        $this->roles = [];
     }
 
     public function getId(): ?int
@@ -96,7 +109,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
         return $this;
     }
-
+/**
+     * @Groups({"user_read"})
+     */
     public function getEmail(): ?string
     {
         return $this->email;
@@ -216,13 +231,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     // Implement UserInterface methods
 
+    /**
+     * @return Collection|array
+     */
     public function getRoles(): array
     {
-        // Return an array of roles
-        // For example: return ['ROLE_USER'];
-        return [];
-    }
+        $roles = $this->roles;
 
+        // Ensure every user has the ROLE_USER role by default
+        $roles[] = 'ROLE_USER';
+
+        return array_unique($roles);
+    }
+    public function setRoles(array $roles): self
+    {
+        $this->roles = $roles;
+
+        return $this;
+    }
     public function getSalt()
     {
         // Return null unless you're using bcrypt or a similar algorithm

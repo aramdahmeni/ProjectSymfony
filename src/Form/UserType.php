@@ -12,6 +12,7 @@ use Symfony\Component\Form\Extension\Core\Type\RepeatedType;
 use Symfony\Component\Form\Extension\Core\Type\PasswordType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use App\Enum\UserTypes;
+use Symfony\Component\Form\Extension\Core\Type\EmailType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 class UserType extends AbstractType
@@ -22,7 +23,7 @@ class UserType extends AbstractType
         $builder
         ->add('nom')
         ->add('prenom')
-        ->add('email')
+        ->add('email',EmailType::class)
         ->add('numtel')
         ->add('type', ChoiceType::class, [
             'choices' => [

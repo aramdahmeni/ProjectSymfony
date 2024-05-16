@@ -1,0 +1,12 @@
+{% extends 'base.html.twig' %}
+
+{% block title %}Home Page{% endblock %}
+
+{% block body %}
+    <h1>Welcome to Your Symfony Application!</h1>
+    <!-- Add your content here -->
+    
+    {% if app.user %}
+        <a href="{{ path('app_logout') }}">Logout</a>
+    {% endif %}
+{% endblock %}

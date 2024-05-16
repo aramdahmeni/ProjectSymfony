@@ -29,26 +29,13 @@ class PostController extends AbstractController
     }
 
     #[Route('/', name: 'app_post_index', methods: ['GET'])]
-    public function index(
-        PostRepository $postRepository,
-        CommentRepository $commentRepository,
-        HttpClientInterface $client
-    ): Response {
-        $comments = [];
-        $response = $client->request('GET', 'API_URL');
-        $posts = $response->toArray();
-    
-        // Fetch comments for each post
-        foreach ($posts as $post) {
-            $comments[$post->getId()] = $commentRepository->findBy(['post' => $post]);
-        }
+    public function index(PostRepository $postRepository): Response {
+        $posts = $postRepository->findAll();
     
         return $this->render('post/index.html.twig', [
-            'posts' => $posts, // Removed unnecessary array wrapping
-            'comments' => $comments,
+            'posts' => $posts,
         ]);
     }
-    
 
 
 #[Route('/new', name: 'app_post_new', methods: ['GET', 'POST'])]
@@ -61,7 +48,11 @@ public function new(Request $request): Response
     if ($form->isSubmitted() && $form->isValid()) {
         // Handle file upload
         $uploadedFiles = $request->files->get('post')['files'];
-
+        $isPublic = $form->get('estPublie')->getData();
+        $selectedUser = $form->get('user')->getData();
+        $post->setUser($selectedUser);
+        // Set 'estPublie' property based on checkbox value
+        $post->setEstPublie($isPublic);
         foreach ($uploadedFiles as $uploadedFile) {
             // Create a new File entity for each uploaded file
             $file = new File();
@@ -72,10 +63,10 @@ public function new(Request $request): Response
             $file->setFileName($fileName);
             // Add the file to the Post entity
             $post->addFile($file);
-        }
 
-        // Set other properties of the Post entity as needed
-        $post->setPublished(new \DateTime());
+            // Persist the new File entity
+            $this->entityManager->persist($file);
+        }
 
         // Persist the Post entity
         $this->entityManager->persist($post);
@@ -89,6 +80,7 @@ public function new(Request $request): Response
         'form' => $form->createView(),
     ]);
 }
+
 
 
     #[Route('/{id}', name: 'app_post_show', methods: ['GET'])]

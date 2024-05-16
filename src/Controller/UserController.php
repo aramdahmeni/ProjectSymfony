@@ -1,6 +1,7 @@
 <?php
 
 namespace App\Controller;
+use App\Security\AppRoles;
 
 use App\Entity\User;
 use App\Form\UserType;
@@ -11,16 +12,19 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
+use Symfony\Contracts\HttpClient\HttpClientInterface;
 #[Route('/user')]
 class UserController extends AbstractController
 {
     #[Route('/', name: 'app_user_index', methods: ['GET'])]
-    public function index(UserRepository $userRepository): Response
+    public function index(UserRepository $userRepository, HttpClientInterface $client,SerializerInterface $serializer ): Response
     {
-        return $this->render('user/index.html.twig', [
-            'users' => $userRepository->findAll(),
-        ]);
+        $data = $userRepository->findAll();
+        $response = $serializer->serialize($data, 'json');
+        return new JsonResponse($response, 200, [], true);
     }
 
     #[Route('/new', name: 'app_user_new', methods: ['GET', 'POST'])]
@@ -34,7 +38,7 @@ class UserController extends AbstractController
             // Hash the password
             $user->setPassword($passwordHasher->hashPassword($user, $user->getPassword()));
             $user->setType($form->get('type')->getData());
-
+            $user->setRoles([AppRoles::ROLE_USER]);
             $entityManager->persist($user);
             $entityManager->flush();
     

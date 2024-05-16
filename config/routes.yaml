@@ -83,3 +83,14 @@ app_user_delete:
   path: /users/{id}
   controller: 'App\Controller\UserController::delete'
   methods: ['POST']
+app_login:
+    path: /login
+    controller: App\Controller\AuthController::login
+
+app_logout:
+    path: /logout
+    controller: App\Controller\AuthController::logout
+
+home:
+    path: /
+    controller: App\Controller\HomeController::index
