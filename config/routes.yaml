@@ -3,62 +3,59 @@ controllers:
     type: attribute
 
 app_post_index:
-    path: /posts
-    controller: 'App\Controller\PostController::index'
-    methods: ['GET']
+    path: /post
+    controller: App\Controller\PostController::index
+    methods: GET
+
 app_post_new:
-  path: /posts/new
-  controller: 'App\Controller\PostController::new'
-  methods: ['GET', 'POST']
+    path: /post/new
+    controller: App\Controller\PostController::new
+    methods: POST
 
 app_post_show:
-  path: /posts/{id}
-  controller: 'App\Controller\PostController::show'
-  methods: ['GET']
+    path: /post/{id}
+    controller: App\Controller\PostController::show
+    methods: GET
 
 app_post_edit:
-  path: /posts/{id}/edit
-  controller: 'App\Controller\PostController::edit'
-  methods: ['GET', 'POST']
+    path: /post/{id}/edit
+    controller: App\Controller\PostController::edit
+    methods: PUT
 
 app_post_delete:
-  path: /posts/{id}
-  controller: 'App\Controller\PostController::delete'
-  methods: ['POST']
+    path: /post/{id}
+    controller: App\Controller\PostController::delete
+    methods: DELETE
 
 app_post_comments:
-  path: /posts/{postId}/comments
-  controller: 'App\Controller\PostController::comments'
-  methods: ['GET']
+    path: /post/{postId}/comments
+    controller: App\Controller\PostController::comments
+    methods: GET
+
 app_comment_index:
-  path: /comments
-  controller: 'App\Controller\CommentController::index'
-  methods: ['GET']
+    path: /comments
+    controller: App\Controller\CommentController::index
+    methods: ['GET']
 
 app_comment_new:
-  path: /comments/new/{postId}
-  controller: 'App\Controller\CommentController::new'
-  methods: ['GET', 'POST']
+    path: /comment/new/{postId}
+    controller: App\Controller\CommentController::new
+    methods: ['POST']
 
 app_comment_show:
-  path: /comments/{id}
-  controller: 'App\Controller\CommentController::show'
-  methods: ['GET']
+    path: /comment/{id}
+    controller: App\Controller\CommentController::show
+    methods: ['GET']
 
 app_comment_show_post:
-  path: /comments/show/{postId}
-  controller: 'App\Controller\CommentController::showComments'
-  methods: ['GET']
-
-app_comment_edit:
-  path: /comments/{id}/edit
-  controller: 'App\Controller\CommentController::edit'
-  methods: ['GET', 'POST']
+    path: /comment/show/{postId}
+    controller: App\Controller\CommentController::showComments
+    methods: ['GET']
 
 app_comment_delete:
-  path: /comments/{id}
-  controller: 'App\Controller\CommentController::delete'
-  methods: ['POST']
+    path: /comment/{id}
+    controller: App\Controller\CommentController::delete
+    methods: ['DELETE']
 app_user_index:
   path: /users
   controller: 'App\Controller\UserController::index'
@@ -167,3 +164,41 @@ app_administrateur_delete:
     path: /administrateur/{id}
     controller: App\Controller\AdministrateurController::delete
     methods: DELETE
+app_like_index:
+    path: /like/
+    controller: App\Controller\LikeController::index
+    methods: GET
+
+app_like_new:
+    path: /like/new
+    controller: App\Controller\LikeController::new
+    methods: POST
+
+app_like_show:
+    path: /like/{id}
+    controller: App\Controller\LikeController::show
+    methods: GET
+
+app_like_delete:
+    path: /like/{id}
+    controller: App\Controller\LikeController::delete
+    methods: DELETE
+app_file_index:
+    path: /file
+    controller: 'App\Controller\FileController::index'
+    methods: ['GET']
+
+app_file_new:
+    path: /file/new
+    controller: 'App\Controller\FileController::new'
+    methods: ['POST']
+
+app_file_show:
+    path: /file/{id}
+    controller: 'App\Controller\FileController::show'
+    methods: ['GET']
+
+app_file_delete:
+    path: /file/{id}
+    controller: 'App\Controller\FileController::delete'
+    methods: ['DELETE']
