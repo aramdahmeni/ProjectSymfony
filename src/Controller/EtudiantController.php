@@ -10,72 +10,91 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\Serializer\SerializerInterface;
+use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
 #[Route('/etudiant')]
 class EtudiantController extends AbstractController
 {
     #[Route('/', name: 'app_etudiant_index', methods: ['GET'])]
-    public function index(EtudiantRepository $etudiantRepository): Response
+    public function index(EtudiantRepository $etudiantRepository, SerializerInterface $serializer): Response
     {
-        return $this->render('etudiant/index.html.twig', [
-            'etudiants' => $etudiantRepository->findAll(),
-        ]);
+        try {
+            $data = $etudiantRepository->findAll();
+            $response = $serializer->serialize($data, 'json');
+            return new JsonResponse($response, 200, [], true);
+        } catch (\Exception $e) {
+            return new JsonResponse(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
     #[Route('/new', name: 'app_etudiant_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager): Response
+    public function new(Request $request, EntityManagerInterface $entityManager,UserPasswordHasherInterface $passwordHasher): Response
     {
-        $etudiant = new Etudiant();
-        $form = $this->createForm(EtudiantType::class, $etudiant);
-        $form->handleRequest($request);
+        $data = json_decode($request->getContent(), true);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($etudiant);
-            $entityManager->flush();
+    $etudiant = new Etudiant();
+    $etudiant->setNom($data['nom']);
+    $etudiant->setPrenom($data['prenom']);
+    $etudiant->setEmail($data['email']);
+    $etudiant->setNumtel($data['numtel']);
+    $etudiant->setType('etudiant');
+    $etudiant->setPassword($passwordHasher->hashPassword($etudiant, $data['password']));
+    $etudiant->setRoles(['ROLE_USER']);
+    $etudiant->setSpecialite($data['specialite']);
 
-            return $this->redirectToRoute('app_etudiant_index', [], Response::HTTP_SEE_OTHER);
-        }
+    $entityManager->persist($etudiant);
+    $entityManager->flush();
 
-        return $this->render('etudiant/new.html.twig', [
-            'etudiant' => $etudiant,
-            'form' => $form,
-        ]);
+    return new JsonResponse(['status' => 'Etudiant created'], Response::HTTP_CREATED);
     }
 
     #[Route('/{id}', name: 'app_etudiant_show', methods: ['GET'])]
-    public function show(Etudiant $etudiant): Response
+    public function show($id,EtudiantRepository $etudiantRepository, SerializerInterface $serializer): Response
     {
-        return $this->render('etudiant/show.html.twig', [
-            'etudiant' => $etudiant,
-        ]);
+        try {
+            $user = $etudiantRepository->find($id);
+            if ($user === null) {
+                throw new \Exception('User not found');
+            }
+            $response = $serializer->serialize($user, 'json');
+            return new JsonResponse($response, 200, [], true);
+        } catch (\Exception $e) {
+            return new JsonResponse(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        }
     }
 
-    #[Route('/{id}/edit', name: 'app_etudiant_edit', methods: ['GET', 'POST'])]
+    #[Route('/{id}/edit', name: 'app_etudiant_edit', methods: ['PUT'])]
     public function edit(Request $request, Etudiant $etudiant, EntityManagerInterface $entityManager): Response
     {
-        $form = $this->createForm(EtudiantType::class, $etudiant);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
+        try{
+            $data = json_decode($request->getContent(), true);
+            $etudiant->setNom($data['nom']);
+            $etudiant->setPrenom($data['prenom']);
+            $etudiant->setNumtel($data['numtel']);
+            $etudiant->setSpecialite($data['specialite']);
             $entityManager->flush();
+            return new JsonResponse(['status' => 'Etudiant updated'], Response::HTTP_OK);
 
-            return $this->redirectToRoute('app_etudiant_index', [], Response::HTTP_SEE_OTHER);
-        }
-
-        return $this->render('etudiant/edit.html.twig', [
-            'etudiant' => $etudiant,
-            'form' => $form,
-        ]);
+        }catch (\Exception $e) {
+        return new JsonResponse(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+    }
     }
 
     #[Route('/{id}', name: 'app_etudiant_delete', methods: ['POST'])]
-    public function delete(Request $request, Etudiant $etudiant, EntityManagerInterface $entityManager): Response
+    public function delete($id, EtudiantRepository $etudiantRepository, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$etudiant->getId(), $request->request->get('_token'))) {
+        try {
+            $etudiant = $etudiantRepository->find($id);
+            if ($etudiant === null) {
+                throw new \Exception('User not found');
+            }
             $entityManager->remove($etudiant);
             $entityManager->flush();
+            return new JsonResponse(['status' => 'User deleted'], Response::HTTP_NO_CONTENT);
+        } catch (\Exception $e) {
+            return new JsonResponse(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-
-        return $this->redirectToRoute('app_etudiant_index', [], Response::HTTP_SEE_OTHER);
     }
 }

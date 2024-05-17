@@ -5,17 +5,15 @@ namespace App\Entity;
 use ApiPlatform\Metadata\ApiResource;
 use App\Repository\AdministrateurRepository;
 use Doctrine\ORM\Mapping as ORM;
-use App\Enum\AdminType;
+use Symfony\Component\Validator\Constraints as Assert;
+
 #[ORM\Entity(repositoryClass: AdministrateurRepository::class)]
 #[ApiResource()]
 class Administrateur extends User
 {
-/**
- * @ORM\Column(length: 255)
- * @Assert\Choice(choices=AdminType::values(), message="Choose a valid type.")
- */
+    #[ORM\Column(type: 'string', length: 255)]
+    #[Assert\Choice(choices: ["agent", "administrateur"], message: 'Choose a valid role (agent or administrateur).')]
     private ?string $role = null;
-
 
     public function getRole(): ?string
     {

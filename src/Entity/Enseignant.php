@@ -42,7 +42,7 @@ class Enseignant extends User
         return $this->codeENS;
     }
 
-    public function setCodeENS(string $codeENS): static
+    public function setCodeENS(string $codeENS): self
     {
         $this->codeENS = $codeENS;
 
@@ -54,7 +54,7 @@ class Enseignant extends User
         return $this->nbAnneeExp;
     }
 
-    public function setNbAnneeExp(int $nbAnneeExp): static
+    public function setNbAnneeExp(int $nbAnneeExp): self
     {
         $this->nbAnneeExp = $nbAnneeExp;
 
@@ -66,7 +66,7 @@ class Enseignant extends User
         return $this->matiere;
     }
 
-    public function setMatiere(string $matiere): static
+    public function setMatiere(string $matiere): self
     {
         $this->matiere = $matiere;
 
@@ -81,7 +81,7 @@ class Enseignant extends User
         return $this->classes;
     }
 
-    public function addIdClass(Classe $idClass): static
+    public function addIdClass(Classe $idClass): self
     {
         if (!$this->classes->contains($idClass)) {
             $this->classes->add($idClass);
@@ -90,7 +90,7 @@ class Enseignant extends User
         return $this;
     }
 
-    public function removeIdClass(Classe $idClass): static
+    public function removeIdClass(Classe $idClass): self
     {
         $this->classes->removeElement($idClass);
 

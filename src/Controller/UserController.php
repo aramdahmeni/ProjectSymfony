@@ -2,7 +2,7 @@
 
 namespace App\Controller;
 use App\Security\AppRoles;
-
+use App\Enum\UserTypes;
 use App\Entity\User;
 use App\Form\UserType;
 use App\Repository\UserRepository;
@@ -22,42 +22,65 @@ class UserController extends AbstractController
     #[Route('/', name: 'app_user_index', methods: ['GET'])]
     public function index(UserRepository $userRepository, HttpClientInterface $client,SerializerInterface $serializer ): Response
     {
-        $data = $userRepository->findAll();
-        $response = $serializer->serialize($data, 'json');
-        return new JsonResponse($response, 200, [], true);
-    }
-
-    #[Route('/new', name: 'app_user_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager,UserPasswordHasherInterface $passwordHasher): Response
-    {
-        $user = new User();
-        $form = $this->createForm(UserType::class, $user);
-        $form->handleRequest($request);
-
-        if ($form->isSubmitted() && $form->isValid()) {
-            // Hash the password
-            $user->setPassword($passwordHasher->hashPassword($user, $user->getPassword()));
-            $user->setType($form->get('type')->getData());
-            $user->setRoles([AppRoles::ROLE_USER]);
-            $entityManager->persist($user);
-            $entityManager->flush();
-    
-            return $this->redirectToRoute('app_user_index', [], Response::HTTP_SEE_OTHER);
+        try
+            {$data = $userRepository->findAll();
+            $response = $serializer->serialize($data, 'json');
+            return new JsonResponse($response, 200, [], true);
+        } catch (\Exception $e) {
+            return new JsonResponse(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-    
-        return $this->render('user/new.html.twig', [
-            'user' => $user,
-            'form' => $form,
-        ]);
     }
 
-    #[Route('/{id}', name: 'app_user_show', methods: ['GET'])]
-    public function show(User $user): Response
-    {
-        return $this->render('user/show.html.twig', [
-            'user' => $user,
-        ]);
+    #[Route('/new', name: 'app_user_new', methods: ['POST'])]
+public function new(Request $request, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher): Response
+{
+    try {
+        $data = json_decode($request->getContent(), true);
+
+        // Validate required fields
+        if (empty($data['nom']) || empty($data['prenom']) || empty($data['email']) || empty($data['password']) || empty($data['numtel']) || empty($data['type'])) {
+            return new JsonResponse(['error' => 'Missing required fields'], Response::HTTP_BAD_REQUEST);
+        }
+        // if (!in_array($data['type'], [UserTypes::ETUDIANT, UserTypes::ENSEIGNANT, UserTypes::ADMIN])) {
+        //     return new JsonResponse(['error' => 'Invalid user type'], Response::HTTP_BAD_REQUEST);
+        // }
+
+        $user = new User();
+        $user->setNom($data['nom']);
+        $user->setPrenom($data['prenom']);
+        $user->setEmail($data['email']);
+        $user->setNumtel($data['numtel']);
+        $user->setPassword($passwordHasher->hashPassword($user, $data['password']));
+        $user->setType($data['type']);
+
+        $entityManager->persist($user);
+        $entityManager->flush();
+
+        return new JsonResponse(['status' => 'User created'], Response::HTTP_CREATED);
+    } catch (\Exception $e) {
+        return new JsonResponse(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
     }
+}
+
+    
+
+    
+    #[Route('/{id}', name: 'app_user_show', methods: ['GET'])]
+public function show($id, UserRepository $userRepository, SerializerInterface $serializer): Response
+{
+    try {
+        $user = $userRepository->find($id);
+        if ($user === null) {
+            return new JsonResponse(['error' => 'User not found'], Response::HTTP_NOT_FOUND);
+        }
+        $response = $serializer->serialize($user, 'json');
+        return new JsonResponse($response, 200, [], true);
+    } catch (\Exception $e) {
+        return new JsonResponse(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+    }
+}
+
+    
 
     #[Route('/{id}/edit', name: 'app_user_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, User $user, EntityManagerInterface $entityManager, UserPasswordHasherInterface $passwordHasher): Response
@@ -80,14 +103,19 @@ class UserController extends AbstractController
         ]);
     }
 
-    #[Route('/{id}', name: 'app_user_delete', methods: ['POST'])]
-    public function delete(Request $request, User $user, EntityManagerInterface $entityManager): Response
+    #[Route('/{id}', name: 'app_user_delete', methods: ['DELETE'])]
+    public function delete($id, UserRepository $userRepository, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$user->getId(), $request->request->get('_token'))) {
+        try {
+            $user = $userRepository->find($id);
+            if ($user === null) {
+                throw new \Exception('User not found');
+            }
             $entityManager->remove($user);
             $entityManager->flush();
+            return new JsonResponse(['status' => 'User deleted'], Response::HTTP_NO_CONTENT);
+        } catch (\Exception $e) {
+            return new JsonResponse(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
         }
-
-        return $this->redirectToRoute('app_user_index', [], Response::HTTP_SEE_OTHER);
     }
 }

@@ -1,79 +1,66 @@
 <?php
 
 namespace App\Entity;
-use Symfony\Component\Serializer\Annotation\Groups;
 
+use Symfony\Component\Serializer\Annotation\Groups;
 use App\Repository\UserRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use App\Enum\UserType;
+use App\Enum\UserTypes;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
-use Symfony\Component\PasswordHasher\PasswordHasherInterface;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: UserRepository::class)]
-#[ORM\InheritanceType("SINGLE_TABLE")]
-#[ORM\DiscriminatorColumn(name: "user_type", type: "string")]
-#[ORM\DiscriminatorMap([
-    "user" => "User",
-    "etudiant" => "Etudiant",
-    "enseignant" => "Enseignant",
-    "administrateur" => "Administrateur",
-])]
+#[UniqueEntity(fields: ['email'], message: 'There is already an account with this email')]
+#[ORM\InheritanceType("JOINED")]
+
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column]
+    #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(type: 'string', length: 255)]
     private ?string $nom = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(type: 'string', length: 255)]
     private ?string $prenom = null;
 
-    
-    #[ORM\Column(length: 255, unique: true)]
+    #[ORM\Column(type: 'string', length: 255, unique: true)]
     #[Assert\Email]
+    #[Groups(["user_read"])]
     private ?string $email = null;
 
-    #[ORM\Column]
+    #[ORM\Column(type: 'integer')]
     private ?int $numtel = null;
 
-    /**
-     * @ORM\Column
-     * @Assert\Choice(choices=UserTypes::values(), message="Choose a valid type.")
-     */
+    #[ORM\Column(type: 'string', length: 255)]
+    #[Assert\Choice(choices: [UserTypes::ETUDIANT, UserTypes::ENSEIGNANT, UserTypes::ADMIN], message: 'Choose a valid type.')]
     private ?string $type = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(type: 'string', length: 255)]
     private ?string $password = null;
 
     /**
-     * @Assert\NotBlank()
+     * @Assert\NotBlank
      * @Assert\Length(min=6)
      */
     private ?string $confirmPassword = null;
-    /**
-     * @ORM\OneToMany(targetEntity=Like::class, mappedBy="user")
-     */
+
+    #[ORM\Column(type: 'json')]
+    private array $roles = [];
+
+    #[ORM\OneToMany(targetEntity: Like::class, mappedBy: "user")]
     private Collection $likes;
 
- /**
-     * @ORM\OneToMany(targetEntity=Post::class, mappedBy="user", orphanRemoval=true)
-     * @Groups({"user_read"})
-     */    private Collection $posts;
+    #[ORM\OneToMany(targetEntity: Post::class, mappedBy: "user", orphanRemoval: true)]
+    #[Groups(["user_read"])]
+    private Collection $posts;
 
-    /**
-     * @ORM\Column(type="json")
-     */
-    private $roles = [];
-
-    
     public function __construct()
     {
         $this->likes = new ArrayCollection();
@@ -91,10 +78,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->nom;
     }
 
-    public function setNom(string $nom): static
+    public function setNom(string $nom): self
     {
         $this->nom = $nom;
-
         return $this;
     }
 
@@ -103,13 +89,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->prenom;
     }
 
-    public function setPrenom(string $prenom): static
+    public function setPrenom(string $prenom): self
     {
         $this->prenom = $prenom;
-
         return $this;
     }
-/**
+
+    /**
      * @Groups({"user_read"})
      */
     public function getEmail(): ?string
@@ -117,10 +103,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->email;
     }
 
-    public function setEmail(string $email): static
+    public function setEmail(string $email): self
     {
         $this->email = $email;
-
         return $this;
     }
 
@@ -129,10 +114,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->numtel;
     }
 
-    public function setNumtel(int $numtel): static
+    public function setNumtel(int $numtel): self
     {
         $this->numtel = $numtel;
-
         return $this;
     }
 
@@ -141,22 +125,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->type;
     }
 
-    public function setType(string $type): static
+    public function setType(string $type): self
     {
         $this->type = $type;
-
-        return $this;
-    }
-
-    public function getconfirmPassword(): ?string
-    {
-        return $this->confirmPassword;
-    }
-
-    public function setconfirmPassword(string $password): static
-    {
-        $this->confirmPassword = $password;
-
         return $this;
     }
 
@@ -165,9 +136,21 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->password;
     }
 
-    public function setPassword(string $password): void
+    public function setPassword(string $password): self
     {
         $this->password = $password;
+        return $this;
+    }
+
+    public function getConfirmPassword(): ?string
+    {
+        return $this->confirmPassword;
+    }
+
+    public function setConfirmPassword(string $confirmPassword): self
+    {
+        $this->confirmPassword = $confirmPassword;
+        return $this;
     }
 
     /**
@@ -177,14 +160,13 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         return $this->likes;
     }
-    
+
     public function addLike(Like $like): self
     {
         if (!$this->likes->contains($like)) {
             $this->likes[] = $like;
             $like->setUser($this);
         }
-
         return $this;
     }
 
@@ -196,9 +178,9 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $like->setUser(null);
             }
         }
-
         return $this;
     }
+
     /**
      * @return Collection<int, Post>
      */
@@ -207,17 +189,16 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->posts;
     }
 
-    public function addPost(Post $post): static
+    public function addPost(Post $post): self
     {
         if (!$this->posts->contains($post)) {
             $this->posts->add($post);
             $post->setUser($this);
         }
-
         return $this;
     }
 
-    public function removePost(Post $post): static
+    public function removePost(Post $post): self
     {
         if ($this->posts->removeElement($post)) {
             // set the owning side to null (unless already changed)
@@ -225,10 +206,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
                 $post->setUser(null);
             }
         }
-
         return $this;
     }
-
     // Implement UserInterface methods
 
     /**
@@ -238,7 +217,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     {
         $roles = $this->roles;
 
-        // Ensure every user has the ROLE_USER role by default
         $roles[] = 'ROLE_USER';
 
         return array_unique($roles);
@@ -251,8 +229,6 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     }
     public function getSalt()
     {
-        // Return null unless you're using bcrypt or a similar algorithm
-        // If using bcrypt, it automatically handles salts
         return null;
     }
 

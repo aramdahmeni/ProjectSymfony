@@ -1,13 +1,10 @@
 <?php
+
 namespace App\Enum;
 
-
-/**
- * @method static AdminType AGENT()
- * @method static AdminType ADMIN()
- */
-Enum AdminType
+enum AdminType: string
 {
-    private const AGENT = 'agent';
-    private const ADMIN = 'admin';
+    case AGENT = 'agent';
+    case ADMIN = 'admin';
+
 }

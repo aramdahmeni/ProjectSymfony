@@ -67,7 +67,7 @@ app_user_index:
 app_user_new:
   path: /users/new
   controller: 'App\Controller\UserController::new'
-  methods: ['GET', 'POST']
+  methods: ['POST']
 
 app_user_show:
   path: /users/{id}
@@ -82,7 +82,7 @@ app_user_edit:
 app_user_delete:
   path: /users/{id}
   controller: 'App\Controller\UserController::delete'
-  methods: ['POST']
+  methods: ['DELETE']
 app_login:
     path: /login
     controller: App\Controller\AuthController::login
@@ -94,3 +94,76 @@ app_logout:
 home:
     path: /
     controller: App\Controller\HomeController::index
+
+etudiant_index:
+    path: /etudiant/
+    controller: App\Controller\EtudiantController::index
+    methods: GET
+
+etudiant_new:
+    path: /etudiant/new
+    controller: App\Controller\EtudiantController::new
+    methods: POST
+
+etudiant_show:
+    path: /etudiant/{id}
+    controller: App\Controller\EtudiantController::show
+    methods: GET
+
+etudiant_edit:
+    path: /etudiant/{id}/edit
+    controller: App\Controller\EtudiantController::edit
+    methods: POST
+
+etudiant_delete:
+    path: /etudiant/{id}
+    controller: App\Controller\EtudiantController::delete
+    methods: DELETE
+app_enseignant_index:
+    path: /enseignant/
+    controller: App\Controller\EnseignantController::index
+    methods: GET
+
+app_enseignant_new:
+    path: /enseignant/new
+    controller: App\Controller\EnseignantController::new
+    methods: POST
+
+app_enseignant_show:
+    path: /enseignant/{id}
+    controller: App\Controller\EnseignantController::show
+    methods: GET
+
+app_enseignant_edit:
+    path: /enseignant/{id}/edit
+    controller: App\Controller\EnseignantController::edit
+    methods: PUT
+
+app_enseignant_delete:
+    path: /enseignant/{id}
+    controller: App\Controller\EnseignantController::delete
+    methods: DELETE
+app_administrateur_index:
+    path: /administrateur/
+    controller: App\Controller\AdministrateurController::index
+    methods: GET
+
+app_administrateur_new:
+    path: /administrateur/new
+    controller: App\Controller\AdministrateurController::new
+    methods: POST
+
+app_administrateur_show:
+    path: /administrateur/{id}
+    controller: App\Controller\AdministrateurController::show
+    methods: GET
+
+app_administrateur_edit:
+    path: /administrateur/{id}/edit
+    controller: App\Controller\AdministrateurController::edit
+    methods: PUT
+
+app_administrateur_delete:
+    path: /administrateur/{id}
+    controller: App\Controller\AdministrateurController::delete
+    methods: DELETE
