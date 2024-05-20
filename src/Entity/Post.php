@@ -8,6 +8,7 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use ApiPlatform\Metadata\ApiResource;
 use phpDocumentor\Reflection\Types\Boolean;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: PostRepository::class)]
 #[ApiResource()]
@@ -32,6 +33,7 @@ class Post
     private Collection $likes;
 
     #[ORM\OneToMany(targetEntity: File::class, mappedBy: 'post')]
+    
     private Collection $files;
 
     #[ORM\Column]
