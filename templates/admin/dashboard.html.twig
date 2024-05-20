@@ -11,4 +11,9 @@
             font-weight: bold;
         }
     </style>
+    <script>
+        document.getElementById('home-button').addEventListener('click', function() {
+            localStorage.clear(); // Clear local storage
+        });
+    </script>
 {% endblock %}
