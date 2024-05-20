@@ -1,7 +1,9 @@
 vich_uploader:
     db_driver: orm
     mappings:
-        post_files:
-            uri_prefix: /uploads/posts
-            upload_destination: '%kernel.project_dir%/public/uploads/posts'
-            namer: Vich\UploaderBundle\Naming\OrignameNamer
+        file_upload:
+            uri_prefix: /uploads/files
+            upload_destination: '%kernel.project_dir%/public/uploads/files'
+            inject_on_load: false
+            delete_on_update: true
+            delete_on_remove: true

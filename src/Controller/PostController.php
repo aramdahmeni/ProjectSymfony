@@ -102,28 +102,29 @@ public function new(Request $request, UserRepository $userRepository): JsonRespo
                 throw new \Exception('User not found');
             }
             $post->setUser($user);
+            $post->setFile($request->get('file'));
+            // $uploadedFiles = $request->files->get('files');
+            // if ($uploadedFiles) {
+            //     foreach ($uploadedFiles as $uploadedFile) {
+            //         if ($uploadedFile instanceof UploadedFile) {
+            //             $file = new File();
+            //             $fileName = md5(uniqid()) . '.' . $uploadedFile->guessExtension();
 
-            $uploadedFiles = $request->files->get('files');
-            if ($uploadedFiles) {
-                foreach ($uploadedFiles as $uploadedFile) {
-                    if ($uploadedFile instanceof UploadedFile) {
-                        $file = new File();
-                        $fileName = md5(uniqid()) . '.' . $uploadedFile->guessExtension();
+            //             // Save to Symfony directory
+            //             $symfonyUploadsDir = $this->getParameter('symfony_uploads_directory');
+            //             $uploadedFile->move($symfonyUploadsDir, $fileName);
 
-                        // Save to Symfony directory
-                        $symfonyUploadsDir = $this->getParameter('symfony_uploads_directory');
-                        $uploadedFile->move($symfonyUploadsDir, $fileName);
+            //             // Copy to Angular directory
+            //             $angularAssetsDir = $this->getParameter('angular_assets_directory');
+            //             copy($symfonyUploadsDir . '/' . $fileName, $angularAssetsDir . '/' . $fileName);
 
-                        // Copy to Angular directory
-                        $angularAssetsDir = $this->getParameter('angular_assets_directory');
-                        copy($symfonyUploadsDir . '/' . $fileName, $angularAssetsDir . '/' . $fileName);
+            //             $file->setFileName($fileName);
+            //             $post->addFile($file);
+            //             $this->entityManager->persist($file);
+            //         }
+            //     }
+            // }
 
-                        $file->setFileName($fileName);
-                        $post->addFile($file);
-                        $this->entityManager->persist($file);
-                    }
-                }
-            }
 
             $this->entityManager->persist($post);
             $this->entityManager->flush();
