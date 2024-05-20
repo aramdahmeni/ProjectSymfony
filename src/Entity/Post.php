@@ -37,7 +37,7 @@ class Post
     
     private Collection $files;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 255, nullable: true)]
     private ?string $file = null;
 
     #[ORM\Column]

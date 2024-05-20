@@ -47,12 +47,13 @@ class PostController extends AbstractController
     public function new(Request $request, UserRepository $userRepository): JsonResponse
     {
         try {
+            $data = json_decode($request->getContent(), true);
             $post = new Post();
-            $post->setContenu($request->get('contenu'));
+            $post->setContenu($data['contenu']);
             $post->setPublished(new \DateTime());
-            $post->setEstPublie($request->get('estPublie'));
+            $post->setEstPublie($data['estPublie']);
 
-            $user = $userRepository->find($request->get('user'));
+            $user = $userRepository->find($data['user']);
             if (!$user) {
                 throw new \Exception('User not found');
             }
