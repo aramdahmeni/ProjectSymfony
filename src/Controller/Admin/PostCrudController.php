@@ -70,7 +70,20 @@ class PostCrudController extends AbstractCrudController
         $uploadedFile = $files->get('Post')['uploadFile'];
         if ($uploadedFile instanceof UploadedFile) {
             $fileName = md5(uniqid()) . '.' . $uploadedFile->guessExtension();
-            $uploadedFile->move($this->getParameter('uploads_directory'), $fileName);
+            $symfonyUploadsDir = $this->getParameter('uploads_directory');
+            $angularAssetsDir = $this->getParameter('angular_assets_directory');
+
+            // Move file to Symfony uploads directory
+            $uploadedFile->move($symfonyUploadsDir, $fileName);
+
+            // Ensure the Angular assets directory exists
+            if (!is_dir($angularAssetsDir)) {
+                mkdir($angularAssetsDir, 0777, true);
+            }
+
+            // Copy file to Angular assets directory
+            copy($symfonyUploadsDir . '/' . $fileName, $angularAssetsDir . '/' . $fileName);
+
             $post->setFile($fileName);
         }
     }
