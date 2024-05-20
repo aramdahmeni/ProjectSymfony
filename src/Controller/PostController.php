@@ -62,9 +62,7 @@ class PostController extends AbstractController
             $uploadedFile = $request->files->get('file');
             if ($uploadedFile instanceof UploadedFile) {
                 // Use original filename
-                $originalFilename = pathinfo($uploadedFile->getClientOriginalName(), PATHINFO_FILENAME);
-                $safeFilename = md5(uniqid()).'_'.preg_replace('/[^a-zA-Z0-9-_\.]/','_', $originalFilename);
-                $fileName = $safeFilename . '.' . $uploadedFile->guessExtension();
+                $fileName = md5(uniqid()) . '.' . $uploadedFile->guessExtension();
 
                 // Save to Symfony directory
                 $symfonyUploadsDir = $this->getParameter('uploads_directory');
