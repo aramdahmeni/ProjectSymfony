@@ -12,9 +12,8 @@ use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
-use EasyCorp\Bundle\EasyAdminBundle\Field\FileField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\ImageField;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
-use Symfony\Component\Form\FormInterface;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Component\HttpFoundation\File\UploadedFile;
 
@@ -39,6 +38,10 @@ class PostCrudController extends AbstractCrudController
             DateTimeField::new('published')->setLabel('Published At'),
             AssociationField::new('user')->setLabel('Author'),
             BooleanField::new('est_publie')->setLabel('public'),
+            ImageField::new('file')
+                ->setLabel('Uploaded File')
+                ->setBasePath('/uploads')
+                ->onlyOnIndex(),
             TextField::new('uploadFile', 'Upload File')
             ->setFormType(FileType::class)
             ->setFormTypeOption('mapped', false)

@@ -19,7 +19,10 @@ class Administrateur extends User
     {
         return $this->role;
     }
-
+    public function __construct()
+    {
+        $this->setType('administrateur');
+    }
     public function setRole(string $role): static
     {
         $this->role = $role;
