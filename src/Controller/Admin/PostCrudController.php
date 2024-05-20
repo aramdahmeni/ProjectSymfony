@@ -47,12 +47,14 @@ class PostCrudController extends AbstractCrudController
             ->setFormTypeOption('mapped', false)
             ->onlyOnForms(),
 
-            // IntegerField::new('commentsCount')
-            //     ->setLabel('Number of Comments')
-            //     ->formatValue(fn ($value, $entity) => $entity->getCommentsCount()),
-            // IntegerField::new('likesCount')
-            //     ->setLabel('Number of Likes')
-            //     ->formatValue(fn ($value, $entity) => $entity->getLikesCount())
+            IntegerField::new('commentsCount')
+                ->setLabel('Number of Comments')
+                ->formatValue(fn ($value, $entity) => $entity->getCommentsCount())
+                ->onlyOnIndex(),
+            IntegerField::new('likesCount')
+                ->setLabel('Number of Likes')
+                ->formatValue(fn ($value, $entity) => $entity->getLikesCount())
+                ->onlyOnIndex(),
         ];
     }
     public function persistEntity(EntityManagerInterface $entityManager, $entityInstance): void
