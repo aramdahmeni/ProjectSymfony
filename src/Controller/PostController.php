@@ -45,48 +45,51 @@ class PostController extends AbstractController
 
     #[Route('/new', name: 'app_post_new', methods: ['POST'])]
     public function new(Request $request, UserRepository $userRepository): JsonResponse
-    {
-        try {
-            $data = json_decode($request->getContent(), true);
-            $post = new Post();
-            $post->setContenu($data['contenu']);
-            $post->setPublished(new \DateTime());
-            $post->setEstPublie($data['estPublie']);
+{
+    try {
+        $data = json_decode($request->getContent(), true);
+        $post = new Post();
+        $post->setContenu($data['contenu']);
+        $post->setPublished(new \DateTime());
+        $post->setEstPublie($data['estPublie']);
 
-            $user = $userRepository->find($data['user']);
-            if (!$user) {
-                throw new \Exception('User not found');
-            }
-            $post->setUser($user);
-
-            // Handle file upload
-            $uploadedFile = $request->files->get('file');
-            if ($uploadedFile instanceof UploadedFile) {
-                // Use original filename
-                $fileName = md5(uniqid()) . '.' . $uploadedFile->guessExtension();
-
-                // Save to Symfony directory
-                $symfonyUploadsDir = $this->getParameter('uploads_directory');
-                $uploadedFile->move($symfonyUploadsDir, $fileName);
-
-                // Copy to Angular directory
-                $angularAssetsDir = $this->getParameter('angular_assets_directory');
-                if (!is_dir($angularAssetsDir)) {
-                    mkdir($angularAssetsDir, 0777, true);
-                }
-                copy($symfonyUploadsDir . '/' . $fileName, $angularAssetsDir . '/' . $fileName);
-
-                $post->setFile($fileName);
-            }
-
-            $this->entityManager->persist($post);
-            $this->entityManager->flush();
-
-            return new JsonResponse(['status' => 'Post created'], Response::HTTP_CREATED);
-        } catch (\Exception $e) {
-            return new JsonResponse(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
+        $user = $userRepository->find($data['user']);
+        if (!$user) {
+            throw new \Exception('User not found');
         }
+        $post->setUser($user);
+
+        // Handle file upload
+        if (isset($data['file'])) {
+            // Decode Base64 encoded file content
+            $fileData = base64_decode($data['file']);
+
+            // Extract original file extension
+            $originalFileName = md5(uniqid()) . '.' . pathinfo($data['filename'], PATHINFO_EXTENSION);
+
+            // Save file to Symfony directory
+            $symfonyUploadsDir = $this->getParameter('uploads_directory');
+            file_put_contents($symfonyUploadsDir . '/' . $originalFileName, $fileData);
+
+            // Copy to Angular directory
+            $angularAssetsDir = $this->getParameter('angular_assets_directory');
+            if (!is_dir($angularAssetsDir)) {
+                mkdir($angularAssetsDir, 0777, true);
+            }
+            copy($symfonyUploadsDir . '/' . $originalFileName, $angularAssetsDir . '/' . $originalFileName);
+
+            $post->setFile($originalFileName);
+        }
+
+        $this->entityManager->persist($post);
+        $this->entityManager->flush();
+
+        return new JsonResponse(['status' => 'Post created'], Response::HTTP_CREATED);
+    } catch (\Exception $e) {
+        return new JsonResponse(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
     }
+}
+
 
     #[Route('/{id}', name: 'app_post_show', methods: ['GET'])]
     public function show($id, PostRepository $postRepository, SerializerInterface $serializer): JsonResponse
