@@ -64,6 +64,14 @@ class Post
     {
         return $this->contenu;
     }
+    public function getCommentsCount(): ?int
+    {
+        return count($this->getComments());
+    }
+    public function getLikesCount(): ?int
+    {
+        return count($this->getLikes());
+    }
 
     public function setFile(string $file): self
     {

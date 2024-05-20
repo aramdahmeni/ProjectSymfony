@@ -29,4 +29,8 @@ class Administrateur extends User
 
         return $this;
     }
+    public function __toString(): string
+    {
+        return $this->getNom(); // or any other property that uniquely identifies the entity
+    }
 }

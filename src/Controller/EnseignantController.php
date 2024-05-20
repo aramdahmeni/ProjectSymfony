@@ -82,7 +82,7 @@ class EnseignantController extends AbstractController
             $enseignant->setMatiere($data['matiere']);
             $enseignant->setNbAnneeExp($data['nbAnneeExp']);
             $entityManager->flush();
-            return new JsonResponse(['status' => 'Etudiant updated'], Response::HTTP_OK);
+            return new JsonResponse(['status' => 'enseignant updated'], Response::HTTP_OK);
         }
         catch (\Exception $e) {
             return new JsonResponse(['error' => $e->getMessage()], Response::HTTP_INTERNAL_SERVER_ERROR);
