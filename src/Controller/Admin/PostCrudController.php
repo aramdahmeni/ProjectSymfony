@@ -11,6 +11,7 @@ use EasyCorp\Bundle\EasyAdminBundle\Field\TextField;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Actions;
 use EasyCorp\Bundle\EasyAdminBundle\Config\Action;
 use EasyCorp\Bundle\EasyAdminBundle\Field\AssociationField;
+use EasyCorp\Bundle\EasyAdminBundle\Field\BooleanField;
 use EasyCorp\Bundle\EasyAdminBundle\Field\Field;
 use Symfony\Component\Form\Extension\Core\Type\FileType;
 use EasyCorp\Bundle\EasyAdminBundle\Form\type\FileUploadType;
@@ -35,7 +36,9 @@ class PostCrudController extends AbstractCrudController
             TextField::new('contenu')->setLabel('Content'),
             DateTimeField::new('published')->setLabel('Published At'),
             AssociationField::new('user')->setLabel('Author'),
-            Field::new('files', 'PDF File')->onlyOnForms()->setFormType(FileType::class),
+            BooleanField::new('est_publie')->setLabel('public'),
+            // Field::new('files')->setLabel('PDF File')->onlyOnForms()->setFormType(FileType::class),
+
 
 
             // IntegerField::new('commentsCount')
@@ -46,5 +49,6 @@ class PostCrudController extends AbstractCrudController
             //     ->formatValue(fn ($value, $entity) => $entity->getLikesCount())
         ];
     }
+    
     
 }
